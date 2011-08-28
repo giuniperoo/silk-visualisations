@@ -143,7 +143,6 @@ $(document).ready(function() {
                   var tabDescriptionId = "#tab" + tab + "-description";
 
                   if ($(tabDescriptionId).css('display') == 'none') {
-                      // toggle display
                       toggleDisplay(tabIndex);
                   }
 

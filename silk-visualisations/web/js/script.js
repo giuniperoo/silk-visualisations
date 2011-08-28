@@ -369,6 +369,6 @@ function toggleUploadNoteDisplay() {
     if ($('#upload-note').css('display') == 'block') {
         $('#upload-note').css('display', 'none')
     } else {
-        $('#upload-note').css('display', 'block')
+        $('#upload-note').delay(500).fadeIn();
     }
 }
