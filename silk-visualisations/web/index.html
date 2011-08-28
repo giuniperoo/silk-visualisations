@@ -36,15 +36,14 @@
         <table>
             <tr>
                 <td id="import-box">
-                    <p class="heading">Please select a file to import.</p>
+                    <h2>Silk Visualisations</h2>
 
-                    <p>Files must be in
-                        <a href="http://alignapi.gforge.inria.fr/format.html">Alignment</a>
-                        format. Sample files can be downloaded
-                        <a href="http://dl.dropbox.com/u/1801039/output1.xml">here</a> and
-                        <a href="http://dl.dropbox.com/u/1801039/output2.xml">here</a>.
-                        You can upload multiple files simultaneously (however there is a
-                        5 file limit).</p>
+                    <p>This application provides a set of statistical visualisations
+                        for Alignment files produced <br/> by the
+                        <a href="http://www.assembla.com/spaces/silk/wiki"
+			   target="_blank">Silk&nbsp;Link&nbsp;Discovery&nbsp;Framework</a>.</p>
+
+                    <p class="heading">Please select a file to import.</p>
 
                     <div id="fileupload">
                         <form action="upload" method="post" enctype="multipart/form-data">
@@ -52,7 +51,7 @@
 
                                 <label class="fileinput-button">
                                     <span>Import file(s)...</span>
-                                    <input type="file" name="files[]" id="files" multiple onclick="checkLimit()">
+                                    <input type="file" name="files[]" id="files" multiple>
                                 </label>
                             </div>
                         </form>
@@ -60,6 +59,14 @@
                             <table id="uploaded-files" class="files"></table>
                             <div class="fileupload-progressbar"></div>
                         </div>
+                    </div>
+
+                    <div id="upload-note">
+                        <div style="margin-bottom:5px">&bull; Files must be in
+                            <a href="http://alignapi.gforge.inria.fr/format.html" target="_blank">Alignment</a> format.</div>
+
+                        <div style="margin-bottom:5px">&bull; You can upload multiple files simultaneously
+                            &nbsp;&nbsp;&nbsp;(however there is a 4 file limit).</div>
                     </div>
 
                     <script id="template-upload" type="text/x-jquery-tmpl">
@@ -197,10 +204,10 @@
         </table>
 
         <!-- Warning dialogs -->
-        <div id="limit" title="5 file limit!" style="display:none">
-            <p>Unfortunately, you cannot upload more than <strong>5</strong>
+   <!-- <div id="limit" title="4 file limit!" style="display:none">
+            <p>Unfortunately, you cannot upload more than <strong>4</strong>
                 files at a time. Please delete one or more of your files to continue.</p>
-        </div>
+        </div> -->
 
         <div id="twoFileSelection" title="2 files must be selected to proceed!" style="display:none">
             <p>Prototypes 2 and 3 display a comparison of two files, so you will need
@@ -216,6 +223,9 @@
         <!-- Error message -->
         <div id="processingError">
             <p>Oops... it seems something went wrong :-(</p>
+            <p class="small">Please file an issue at:
+            <a href="http://code.google.com/p/silk-visualisations/issues/list"
+               target="_blank">http://code.google.com/p/silk-visualisations/issues/list</a></p>
         </div>
     </body>
 </html>

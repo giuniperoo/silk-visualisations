@@ -5,8 +5,6 @@
  *	author: Troy Giunipero
  */
 
-a:hover { text-decoration: underline }
-
 a:link, a:visited { color: #bc3604;
                     text-decoration: none;
 }
@@ -25,10 +23,6 @@ input { border: 1px solid #cbc7bd;
         padding: 4px;
 }
 
-#loader, #processingError { display: none;
-                            position: absolute;
-}
-
 #grouping-box { padding-top: 15px }
 
 #grouping-number { border: 0;
@@ -43,6 +37,10 @@ input { border: 1px solid #cbc7bd;
 }
 
 #instruction-text { margin-top: 0 }
+
+#loader, #processingError { display: none;
+                            position: absolute;
+}
 
 #processingError { font-size: large }
 
@@ -60,6 +58,15 @@ input { border: 1px solid #cbc7bd;
 
 #uploaded-files tr.unselected:hover { background-color: #eceadf }
 
+#upload-note { background-color: #fff;
+               border: 1px solid #d9d6c4;
+               border-radius: 5px;
+               display: block;
+               font-size: small;
+               padding: 5px;
+               padding-left: 7px;
+}
+
 .blue-box { background-color: #a1b6d2;
             color: white;
 }
@@ -76,7 +83,6 @@ input { border: 1px solid #cbc7bd;
 
 .mockup { margin-left: 20px;
           border: 1px solid #d9d6c4;
-          height: 450px;
 }
 
 .red-box { background-color: #eaaca7;

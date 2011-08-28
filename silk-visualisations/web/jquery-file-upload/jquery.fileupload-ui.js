@@ -29,7 +29,7 @@
             autoUpload: true,
             // The following option limits the number of files that are
             // allowed to be uploaded using this widget:
-            maxNumberOfFiles: 5,
+            maxNumberOfFiles: 4,
             // The maximum allowed file size:
             maxFileSize: undefined,
             // The minimum allowed file size:

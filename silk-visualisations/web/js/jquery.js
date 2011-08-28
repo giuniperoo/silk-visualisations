@@ -127,22 +127,42 @@ $(document).ready(function() {
           function (e, data) {
               removeData(data);
 
-              // hide 'Render chart' button and display
-              // tab description if all files are removed
+              // if all files are removed:
+              // (1) hide 'Render chart' button
+              // (2) display tab descriptions
+              // (3) display upload note
+              // (4) if processing error is displayed, remove it
               if (fileData.length == 0) {
+
+                  if ($('#render-box').css('display') == 'block') {
+                      $('#render-box').fadeOut();
+                  }
 
                   var tabIndex = getSelectedTabIndex();
                   var tab = tabIndex+1;
                   var tabDescriptionId = "#tab" + tab + "-description";
 
-                  if( $(tabDescriptionId).css('display') == 'none' ) {
+                  if ($(tabDescriptionId).css('display') == 'none') {
                       // toggle display
                       toggleDisplay(tabIndex);
                   }
 
-                  if ($('#render-box').css('display') == 'block') {
-                      $('#render-box').fadeOut();
+                  if ($('#upload-note').css('display') == 'none') {
+                      toggleUploadNoteDisplay();
                   }
+
+                  if ($('#processingError').css('display') == 'block') {
+                      $('#processingError').hide();
+                  }
+              }
+    });
+
+    // callback to hide upload note when 'Open'
+    // button is clicked in File Upload dialog
+    $('#fileupload').bind('fileuploadadd',
+          function (e, data) {
+              if ($('#upload-note').css('display') == 'block') {
+                  toggleUploadNoteDisplay();
               }
     });
 });

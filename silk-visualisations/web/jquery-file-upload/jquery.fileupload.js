@@ -50,27 +50,27 @@
             // By default, each file of a selection is uploaded using an individual
             // request for XHR type uploads. Set to false to upload file
             // selections in one request each:
-singleFileUploads: false,
+            singleFileUploads: false,
             // Set the following option to true to issue all file upload requests
             // in a sequential order:
-sequentialUploads: false,
+            sequentialUploads: false,
             // Set the following option to true to force iframe transport uploads:
             forceIframeTransport: false,
             // By default, XHR file uploads are sent as multipart/form-data.
             // The iframe transport is always using multipart/form-data.
             // Set to false to enable non-multipart XHR uploads:
-multipart: true,  // i.e., application/octet-stream
+            multipart: true,  // i.e., application/octet-stream
             // To upload large files in smaller chunks, set the following option
             // to a preferred maximum chunk size. If set to 0, null or undefined,
             // or the browser does not support the required Blob API, files will
             // be uploaded as a whole.
-maxChunkSize: undefined, // 5000000,  // 5 MB
+            maxChunkSize: undefined, // 5000000,  // 5 MB
             // When a non-multipart upload or a chunked multipart upload has been
             // aborted, this option can be used to resume the upload by setting
             // it to the size of the already uploaded bytes. This option is most
             // useful when modifying the options object inside of the "add" or
             // "send" callbacks, as the options are cloned for each file upload.
-uploadedBytes: undefined, // 10000000,
+            uploadedBytes: undefined, // 10000000,
             // By default, failed (abort or error) file uploads are removed from the
             // global progress calculation. Set the following option to false to
             // prevent recalculating the global progress data:

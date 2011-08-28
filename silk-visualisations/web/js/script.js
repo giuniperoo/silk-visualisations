@@ -21,10 +21,9 @@ var currentlySelected = [];     // array to keep track of selected files in UI
 
 /* Application-specific JavaScript functions */
 
-// Note: Because fileData isn't incremented until the callback, it is
-// still possible for the user to upload more than 5 files *fix!*
+// currently not used (limit specified in file upload widget)
 function checkLimit() {
-    if (fileData.length > 4) {
+    if (fileData.length > 3) {
 
         // call jQuery dialog
         $('#limit').dialog({
@@ -355,12 +354,21 @@ function showLoader() {
 function displayError() {
 
     var pos = $("#tabs").offset();
-    var width = $("#tabs").width();
-    var height = $("#tabs").height();
-    var textWidth = $("#processingError").width();
+    var width = ($("#tabs").width() - $("#processingError").width())/2;
+    var height = ($("#tabs").height() - $("#processingError").height())/2;
 
-    $("#processingError").css( { "left": (pos.left + width/2 - textWidth/2) + "px",
-                                 "top": (pos.top + height/2) + "px" } );
+    $("#processingError").css( { "left": (pos.left + width) + "px",
+                                 "top": (pos.top + height) + "px" } );
 
     $("#processingError").show();
+}
+
+
+// toggles display of upload note (beneath Import file(s) button)
+function toggleUploadNoteDisplay() {
+    if ($('#upload-note').css('display') == 'block') {
+        $('#upload-note').css('display', 'none')
+    } else {
+        $('#upload-note').css('display', 'block')
+    }
 }
