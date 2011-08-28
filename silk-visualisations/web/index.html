@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <title>Silk Visualisations</title>
+
+        <!-- Stylesheets -->
+        <link rel="stylesheet" type="text/css" href="jquery/css/pepper-grinder/jquery-ui-1.8.14.custom.css" id="theme" />
+        <link rel="stylesheet" type="text/css" href="jquery-file-upload/jquery.fileupload-ui.css">
+        <link rel="stylesheet" type="text/css" href="cluetip/jquery.cluetip.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+        <!-- Processing JS -->
+        <script type="application/javascript" src="processing/processing-1.2.1.min.js"></script>
+
+        <!-- jQuery Core and UI -->
+        <script type="text/javascript" src="jquery/js/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="jquery/js/jquery-ui-1.8.14.custom.min.js"></script>
+
+        <!-- File Upload plugin -->
+        <script type="text/javascript" src="jquery-file-upload/jquery.tmpl.min.js"></script>
+        <script type="text/javascript" src="jquery-file-upload/jquery.iframe-transport.js"></script>
+        <script type="text/javascript" src="jquery-file-upload/jquery.fileupload.js"></script>
+        <script type="text/javascript" src="jquery-file-upload/jquery.fileupload-ui.js"></script>
+
+        <!-- Tooltip plugin -->
+        <script type="text/javascript" src="cluetip/jquery.cluetip.min.js"></script>
+
+        <!-- Application-specific JavaScript -->
+        <script type="text/javascript" src="js/script.js"></script>
+        <script type="text/javascript" src="js/jquery.js"></script>
+    </head>
+
+    <body>
+        <table>
+            <tr>
+                <td id="import-box">
+                    <p class="heading">Please select a file to import.</p>
+
+                    <p>Files must be in
+                        <a href="http://alignapi.gforge.inria.fr/format.html">Alignment</a>
+                        format. Sample files can be downloaded
+                        <a href="http://dl.dropbox.com/u/1801039/output1.xml">here</a> and
+                        <a href="http://dl.dropbox.com/u/1801039/output2.xml">here</a>.
+                        You can upload multiple files simultaneously (however there is a
+                        5 file limit).</p>
+
+                    <div id="fileupload">
+                        <form action="upload" method="post" enctype="multipart/form-data">
+                            <div class="fileupload-buttonbar">
+
+                                <label class="fileinput-button">
+                                    <span>Import file(s)...</span>
+                                    <input type="file" name="files[]" id="files" multiple onclick="checkLimit()">
+                                </label>
+                            </div>
+                        </form>
+                        <div class="fileupload-content">
+                            <table id="uploaded-files" class="files"></table>
+                            <div class="fileupload-progressbar"></div>
+                        </div>
+                    </div>
+
+                    <script id="template-upload" type="text/x-jquery-tmpl">
+                        <tr class="template-upload{{if error}} ui-state-error{{/if}}">
+                            <td class="preview"></td>
+                            <td class="name">${name}</td>
+                            <td class="size">${sizef}</td>
+                                            {{if error}}
+                            <td class="error small" colspan="2">Error:
+                                {{if error === 'maxFileSize'}}File is too big
+                                {{else error === 'minFileSize'}}File is too small
+                                {{else error === 'acceptFileTypes'}}Filetype not allowed
+                                {{else error === 'maxNumberOfFiles'}}Max number of files exceeded
+                                {{else}}${error}
+                                {{/if}}
+                            </td>
+                                {{else}}
+                            <td class="progress"><div></div></td>
+                            <td class="start"><button>Start</button></td>
+                                {{/if}}
+                            <td class="cancel"><button>Cancel</button></td>
+                        </tr>
+                    </script>
+                    <script id="template-download" type="text/x-jquery-tmpl">
+                        <tr id="${name}" class="template-download unselected{{if error}} ui-state-error{{/if}}">
+                                {{if error}}
+                            <td></td>
+                            <td class="name">
+                            <td class="size">${sizef}</td>
+                            <td class="error small" colspan="2">Error:
+                                {{if error === 1}}File exceeds upload_max_filesize (php.ini directive)
+                                {{else error === 2}}File exceeds MAX_FILE_SIZE (HTML form directive)
+                                {{else error === 3}}File was only partially uploaded
+                                {{else error === 4}}No File was uploaded
+                                {{else error === 5}}Missing a temporary folder
+                                {{else error === 6}}Failed to write file to disk
+                                {{else error === 7}}File upload stopped by extension
+                                {{else error === 'maxFileSize'}}File is too big
+                                {{else error === 'minFileSize'}}File is too small
+                                {{else error === 'acceptFileTypes'}}Filetype not allowed
+                                {{else error === 'maxNumberOfFiles'}}Max number of files exceeded
+                                {{else error === 'uploadedBytes'}}Uploaded bytes exceed file size
+                                {{else error === 'emptyResult'}}Empty file upload result
+                                {{else}}${error}
+                                {{/if}}
+                            </td>
+                                {{else}}
+                            <td class="preview">
+                                {{if thumbnail_url}}
+                                <a href="${url}" target="_blank"><img src="${thumbnail_url}"></a>
+                                {{/if}}
+                            </td>
+                            <td class="name">   <!-- onclick added (tgiunipero) -->
+                                <a href="${url}" onclick="toggleFileSelection(event)"{{if thumbnail_url}} target="_blank"{{/if}}>${name}</a>
+                            </td>
+                            <td class="size">${sizef}</td>
+                            <td colspan="2"></td>
+                                {{/if}}
+                            <td class="delete">
+                                <button data-type="${delete_type}" data-url="${delete_url}">Delete</button>
+                            </td>
+                        </tr>
+                    </script>
+                </td>
+                <td rowspan="2">
+                    <div id="tabs">
+                        <ul>
+                            <li><a href="#tabs-1">Prototype 1</a></li>
+                            <li><a href="#tabs-2">Prototype 2</a></li>
+                            <li><a href="#tabs-3">Prototype 3</a></li>
+                        </ul>
+                        <div id="tabs-1" class="tab">
+                            <div id="tab1-description">
+                                <div class="small description">This bar chart enables the user to
+                                    view and compare the quantity of matches and confidence scores
+                                    between multiple output files.</div>
+
+                                <img src="img/sketch1.png" class="mockup" alt="sketch1.png" />
+                            </div>
+                            <canvas id="sketch1"
+                                    data-processing-sources="processing/prototype1.pde processing/shared.pde"></canvas>
+                        </div>
+                        <div id="tabs-2" class="tab">
+                            <div id="tab2-description">
+                                <div class="small description">Shows the ratio of shared matches between
+                                    the selected files to independent matches occurring in each file. A
+                                    typical use-case would be seeing how changing the similarity metric
+                                    (e.g., from Jaro-Winkler to Levenshtein) could affect the output.</div>
+
+                                <img src="img/sketch2.png" class="mockup" alt="sketch2.png" />
+                            </div>
+
+                            <canvas id="sketch2"
+                                    data-processing-sources="processing/prototype2.pde processing/shared.pde"></canvas>
+                        </div>
+                        <div id="tabs-3" class="tab">
+                            <div id="tab3-description">
+                                <div class="small description">This scatterplot shows how the confidence
+                                    scores of matches that occur in both jobs have changed between runs.
+                                    Points along the diagonal indicate that the confidence scores of
+                                    shared matches have not changed between runs. Clusters that appear
+                                    outside of the diagonal demonstrate whether scores tend to increase
+                                    or decrease between runs.</div>
+
+                                <img src="img/sketch3.png" class="mockup" alt="sketch3.png" />
+                            </div>
+
+                            <canvas id="sketch3"
+                                    data-processing-sources="processing/prototype3.pde processing/shared.pde"></canvas>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td id="render-box">
+                    <div>
+                        <p id="instruction-text">First select one or two files (click on the file names
+                            above), then click 'Render chart' to view their data in the canvas.</p>
+
+                        <button id="render-chart-btn" />
+                    </div>
+
+                    <div id="grouping-box">
+
+                        <p title="|This represents the number of columns and rows for prototypes 1 and 2, respectively"
+                           style="width:150px">
+                            <label for="grouping-number">Grouping number:</label>
+                            <input type="text" id="grouping-number" readonly />
+                        </p>
+
+                        <div id="grouping-slider"></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Warning dialogs -->
+        <div id="limit" title="5 file limit!" style="display:none">
+            <p>Unfortunately, you cannot upload more than <strong>5</strong>
+                files at a time. Please delete one or more of your files to continue.</p>
+        </div>
+
+        <div id="twoFileSelection" title="2 files must be selected to proceed!" style="display:none">
+            <p>Prototypes 2 and 3 display a comparison of two files, so you will need
+                to select <strong>exactly 2</strong> files to visualise the data.</p>
+        </div>
+
+        <!-- Loader icon -->
+        <div id="loader">
+            <img src="img/loader.gif" />
+            <p>Please wait while data is being prepared...</p>
+        </div>
+
+        <!-- Error message -->
+        <div id="processingError">
+            <p>Oops... it seems something went wrong :-(</p>
+        </div>
+    </body>
+</html>

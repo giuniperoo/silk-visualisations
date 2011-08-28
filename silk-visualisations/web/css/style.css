@@ -1,0 +1,123 @@
+/*
+ *	name: Silk Visualisations
+ *	date: June 2011
+ *	version: 1.0
+ *	author: Troy Giunipero
+ */
+
+a:hover { text-decoration: underline }
+
+a:link, a:visited { color: #bc3604;
+                    text-decoration: none;
+}
+
+body { background-color: #fcfcfc;
+       color: #555;
+       font-family: 'Trebuchet MS', sans-serif;
+       font-size: small;
+       line-height: 1.5;
+       padding: 7px;
+}
+
+canvas { border-radius: 8px }
+
+input { border: 1px solid #cbc7bd;
+        padding: 4px;
+}
+
+#loader, #processingError { display: none;
+                            position: absolute;
+}
+
+#grouping-box { padding-top: 15px }
+
+#grouping-number { border: 0;
+                   color: #bc3604;
+                   font-weight: bolder;
+                   width: 25px;
+}
+
+#import-box { height: 418px;
+              padding-right: 18px;
+              vertical-align: top;
+}
+
+#instruction-text { margin-top: 0 }
+
+#processingError { font-size: large }
+
+#render-box { display: none;
+              padding-right: 18px;
+}
+
+#render-chart-btn { margin: 4px 0 0 6px }
+
+#sketch1, #sketch2, #sketch3 { display: none }
+
+#tab1-description, #tab2-description, #tab2-description { display: block }
+
+#uploaded-files tr { border-bottom: 2px solid #fcfcfc }
+
+#uploaded-files tr.unselected:hover { background-color: #eceadf }
+
+.blue-box { background-color: #a1b6d2;
+            color: white;
+}
+
+.blue-box a { color: black }
+
+.description { padding: 10px 20px;
+               width: 720px;
+}
+
+.heading { color: #333;
+           font-size: 1.15em;
+}
+
+.mockup { margin-left: 20px;
+          border: 1px solid #d9d6c4;
+          height: 450px;
+}
+
+.red-box { background-color: #eaaca7;
+           color: white;
+}
+
+.red-box a { color: black }
+
+.small { font-size: small }
+
+.tab { height: 556px;
+       text-align: left;
+       width: 850px;
+}
+
+
+/* Style rules for file generator */
+#generator { background: #eceadf;
+             border: 1px solid #d9d6c4;
+             float: left;
+             margin:0 auto;
+             padding: 10px;
+             width: 330px;
+}
+
+#generator button{ left: 40%;
+                   position: relative;
+}
+
+#generator h3 { border-bottom: 1px solid #d9d6c4 }
+
+#generator input { border: 1px solid #d9d6c4 ;
+                   color: grey;
+                   margin-bottom: 20px;
+                   margin-left: 10px;
+                   padding: 4px;
+}
+
+#generator label { float: left;
+                   font-weight: bold;
+                   padding: 2px;
+                   text-align: right;
+                   width: 150px;
+}

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+         http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+    <servlet>
+        <servlet-name>UploadHandler</servlet-name>
+        <servlet-class>org.servlet.UploadServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>DataFetcher</servlet-name>
+        <servlet-class>org.servlet.DataServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>FileGenerator</servlet-name>
+        <servlet-class>org.servlet.GeneratorServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UploadHandler</servlet-name>
+        <url-pattern>/upload</url-pattern>
+        <url-pattern>/delete</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>DataFetcher</servlet-name>
+        <url-pattern>/parseData</url-pattern>
+        <url-pattern>/getMatches</url-pattern>
+        <url-pattern>/getFileComparisonData</url-pattern>
+        <url-pattern>/setConfScoreThresholds</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>FileGenerator</servlet-name>
+        <url-pattern>/file-generator/generate</url-pattern>
+    </servlet-mapping>
+
+    <listener>
+        <listener-class>
+            org.apache.commons.fileupload.servlet.FileCleanerCleanup
+        </listener-class>
+    </listener>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+</web-app>

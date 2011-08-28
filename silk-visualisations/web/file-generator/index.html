@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" type="text/css" href="../css/style.css" />
+
+        <title>Output File Generator</title>
+    </head>
+    <body>
+        <h2>Output File Generator</h2>
+
+        <p>Produces a pair of sample output files in Alignment format.
+            <br/>
+            <span style="font-size: smaller">(Files are stored to a folder
+                in your user directory named 'alignmentOutput'.)</span>
+        </p>
+
+
+        <form id="generator" action="generate" method="post" name="form">
+
+            <h3>Output 1</h3>
+
+            <label>File name</label>
+
+            <input type="text" name="name1" id="name1" value="output1.xml"/>
+
+            <label>Number of links</label>
+
+            <input type="text" name="links1" id="links1" value="1000"
+                   onchange="updateSharedPropValues(event)" />
+
+
+            <h3>Output 2</h3>
+
+            <label>File name</label>
+
+            <input type="text" name="name2" id="name2" value="output2.xml" />
+
+            <label>Number of links</label>
+
+            <input type="text" name="links2" id="links2" value="1000"
+                   onchange="updateSharedPropValues(event)" />
+
+
+            <h3>Shared Properties</h3>
+
+            <label>Number of shared links</label>
+
+            <input type="text" name="sharedLinks" id="sharedLinks" value="900" />
+
+            <label>Number of shared links with equal conf scores</label>
+
+            <input type="text" name="equalConfScores" id="equalConfScores"
+                   value="500" />
+
+            <br/><br/>
+            
+            <button type="submit">Generate</button>
+        </form>
+    </body>
+</html>
