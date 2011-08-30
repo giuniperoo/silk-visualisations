@@ -12,11 +12,12 @@ import org.alignment.AlignmentFileWriter;
  * @author tgiunipero
  */
 public class GeneratorServlet extends HttpServlet {
- 
-    private static final String DESTINATION_DIR = System.getProperty("user.home") +
-                                                  System.getProperty("file.separator") +
-                                                  "alignmentOutput" +
-                                                  System.getProperty("file.separator");
+
+	private static final long serialVersionUID = -3668718128910810851L;
+	private static final String DESTINATION_DIR = System.getProperty("user.home") +
+                                                      System.getProperty("file.separator") +
+                                                      "alignmentOutput" +
+                                                      System.getProperty("file.separator");
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -44,7 +45,7 @@ public class GeneratorServlet extends HttpServlet {
         if (success) {
             response.sendRedirect("index.html");
         } else {
-            response.sendError(response.SC_INTERNAL_SERVER_ERROR);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }

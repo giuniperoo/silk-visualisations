@@ -11,32 +11,34 @@ import java.util.List;
  */
 public class AlignmentFile implements Serializable {
 
-    private List entity1Array;
-    private List entity2Array;
-    private List matchings;
+    private static final long serialVersionUID = 7680645765319662728L;
+
+    private List<String> entity1Array;
+    private List<String> entity2Array;
+    private List<String> matchings;
     private String relation;
 
     // class-wide containers for entity URIs of all loaded files
-    private static List Entity1Pool = new ArrayList();
-    private static List Entity2Pool = new ArrayList();
+    private static List<String> Entity1Pool = new ArrayList<String>();
+    private static List<String> Entity2Pool = new ArrayList<String>();
 
 
     // constructor
     public AlignmentFile() {
-        entity1Array = new ArrayList();
-        entity2Array = new ArrayList();
-        matchings = new ArrayList();
+        entity1Array = new ArrayList<String>();
+        entity2Array = new ArrayList<String>();
+        matchings = new ArrayList<String>();
     }
 
-    public List getEntity1Array() {
+    public List<String> getEntity1Array() {
         return entity1Array;
     }
 
-    public List getEntity2Array() {
+    public List<String> getEntity2Array() {
         return entity2Array;
     }
 
-    public List getMatchings() {
+    public List<String> getMatchings() {
         return matchings;
     }
 
@@ -65,10 +67,10 @@ public class AlignmentFile implements Serializable {
         i = i+2;    // shift 2 chars to account for '0.'
 
         String data = "";
-        Iterator iter = getMatchings().iterator();
+        Iterator<String> iter = getMatchings().iterator();
 
         while (iter.hasNext()) {
-            String matching = (String) iter.next();
+            String matching = iter.next();
             String[] tokens = matching.split(",");
             String confScore = tokens[2];
 
@@ -89,11 +91,11 @@ public class AlignmentFile implements Serializable {
         return data;
     }
 
-    public static List getEntity1Pool() {
+    public static List<String> getEntity1Pool() {
         return Entity1Pool;
     }
 
-    public static List getEntity2Pool() {
+    public static List<String> getEntity2Pool() {
         return Entity2Pool;
     }
 }

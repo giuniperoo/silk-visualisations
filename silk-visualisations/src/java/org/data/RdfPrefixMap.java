@@ -9,7 +9,9 @@ import java.util.Iterator;
  *
  * @author tgiunipero
  */
-public class RdfPrefixMap extends HashMap {
+public class RdfPrefixMap extends HashMap<String, String> {
+
+    private static final long serialVersionUID = -6890002928770139064L;
 
     public RdfPrefixMap() {
 
@@ -122,10 +124,10 @@ public class RdfPrefixMap extends HashMap {
         this.put("http://logd.tw.rpi.edu/source/data-gov-au/dataset/catalog/data.gov.au/value-of/agency/","logdau:");
         this.put("http://logd.tw.rpi.edu/source/data-gov-uk/dataset/catalog/data.gov.uk/value-of/department/","logduk:");
         this.put("http://logd.tw.rpi.edu/source/twc-rpi-edu/dataset/logd-million-dataset-challenge/value-of/government_agency/","logd:");
-        
+
     }
 
-    public static final HashMap RDF_PREFIXES = new RdfPrefixMap();
+    public static final HashMap<String, String> RDF_PREFIXES = new RdfPrefixMap();
 
     // Tries to match the input URI against one of the stored
     // prefixes. If no success, the input URI is returned.
@@ -133,8 +135,8 @@ public class RdfPrefixMap extends HashMap {
 
         String prefix = uri;
 
-        for (Iterator it=RDF_PREFIXES.keySet().iterator(); it.hasNext();) {
-            String key = (String) it.next();
+        for (Iterator<String> it=RDF_PREFIXES.keySet().iterator(); it.hasNext();) {
+            String key = it.next();
 
             if (uri.contains(key)) {
 
@@ -142,7 +144,7 @@ public class RdfPrefixMap extends HashMap {
                 break;
             }
         }
-        
+
         return prefix;
     }
 }

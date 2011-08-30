@@ -13,7 +13,8 @@ import org.alignment.AlignmentFile;
  */
 public class DataParser implements Serializable {
 
-    private ArrayList<ArrayList[]> parsedData;
+    private static final long serialVersionUID = 6313075075826515852L;
+    private ArrayList<ArrayList<String[]>[]> parsedData;
 
     private float lowerThreshold, upperThreshold;
 
@@ -126,7 +127,7 @@ public class DataParser implements Serializable {
     }
 
 
-    public ArrayList<ArrayList[]> getParsedData() {
+    public ArrayList<ArrayList<String[]>[]> getParsedData() {
         return this.parsedData;
     }
 
@@ -135,11 +136,11 @@ public class DataParser implements Serializable {
 
         String parsedFileData = "[";
 
-        for (ArrayList[] file : parsedData) {
+        for (ArrayList<String[]>[] file : parsedData) {
 
             parsedFileData += "[";
 
-            for (ArrayList grouping : file) {
+            for (ArrayList<String[]> grouping : file) {
 
                 parsedFileData += "[";
 
@@ -182,11 +183,11 @@ public class DataParser implements Serializable {
     }
 
 
-    public static String getURIs(ArrayList entityPairs) {
+    public static String getURIs(ArrayList<String> entityPairs) {
 
         // references to class-wide containers for entity URIs of all loaded files
-        List entity1Pool = AlignmentFile.getEntity1Pool();
-        List entity2Pool = AlignmentFile.getEntity2Pool();
+        List<String> entity1Pool = AlignmentFile.getEntity1Pool();
+        List<String> entity2Pool = AlignmentFile.getEntity2Pool();
 
         String uriData = "";
 
@@ -198,8 +199,8 @@ public class DataParser implements Serializable {
             int entity1 = Integer.parseInt(ePair[0]);
             int entity2 = Integer.parseInt(ePair[1]);
 
-            String e1 = (String) entity1Pool.get(entity1);
-            String e2 = (String) entity2Pool.get(entity2);
+            String e1 = entity1Pool.get(entity1);
+            String e2 = entity2Pool.get(entity2);
 
             // attempt to find rdf prefix
             e1 = RdfPrefixMap.getPrefix(e1);
@@ -216,7 +217,8 @@ public class DataParser implements Serializable {
     }
 
 
-    public void setConfScoreThresholds(ArrayList fileNames, HashMap uploadedFiles) {
+    public void setConfScoreThresholds(ArrayList<String> fileNames,
+                                       HashMap<String, AlignmentFile> uploadedFiles) {
 
         lowerThreshold = 1;
         upperThreshold = 0;
@@ -227,13 +229,13 @@ public class DataParser implements Serializable {
             min = 1;
             max = 0;
 
-            AlignmentFile file = (AlignmentFile) uploadedFiles.get(fileName);
-            Iterator iter = file.getMatchings().iterator();
+            AlignmentFile file = uploadedFiles.get(fileName);
+            Iterator<String> iter = file.getMatchings().iterator();
 
             // get confidence scores
             while (iter.hasNext()) {
 
-                String matching = (String) iter.next();
+                String matching = iter.next();
                 String[] tokens = matching.split(",");
                 float confidenceScore = Float.parseFloat(tokens[2]);
 
@@ -251,7 +253,7 @@ public class DataParser implements Serializable {
 
             // get lower and upper tenths
             min = Float.parseFloat(String.valueOf(min).substring(0,3));
-            if (min == 1.0f) {  // in case all values are 1.0
+            if (min == 1.0f) {    // in case all values are 1.0
                 min = 0.9f;
             }
 
@@ -287,10 +289,10 @@ public class DataParser implements Serializable {
         rightUniqueCount      = new int[groupingNumber];
         leftSharedMatchCount  = new int[groupingNumber];
         rightSharedMatchCount = new int[groupingNumber];
-        confScoreDelta        = new ArrayList();
+        confScoreDelta        = new ArrayList<String[]>();
 
-        ArrayList[] leftFile = parsedData.get(0);
-        ArrayList[] rightFile = parsedData.get(1);
+        ArrayList<String[]>[] leftFile = parsedData.get(0);
+        ArrayList<String[]>[] rightFile = parsedData.get(1);
 
         String leftEntity1, leftEntity2, leftConfScore;
         String rightEntity1, rightEntity2, rightConfScore;
@@ -355,7 +357,7 @@ public class DataParser implements Serializable {
                                             if(confScores.equals(confScoreDelta.get(matchData)[0])) {
                                                 duplicateMatchFound = true;
                                                 // increment quantity
-                                                int quantity = Integer.parseInt(confScoreDelta.get(matchData)[1]) + 1;
+                                                int quantity = Integer.parseInt(confScoreDelta.get(matchData)[1])+1;
                                                 // append entity pair to existing pairs
                                                 String entityPairs = confScoreDelta.get(matchData)[2] +
                                                                      "|" + entityPair;
@@ -450,7 +452,7 @@ public class DataParser implements Serializable {
     * Organises data from selected files into a multi-dimensional array *
     * (array of ArrayLists). Each ArrayList, or 'grouping' will contain *
     * confidence score values pertaining to that grouping's range.      */
-    public void parseData(ArrayList fileNames, HashMap uploadedFiles) {
+    public void parseData(ArrayList<String> fileNames, HashMap<String, AlignmentFile> uploadedFiles) {
 
         // Get range for confidence score thresholds
         float thresholdRange = (upperThreshold - lowerThreshold);
@@ -458,27 +460,28 @@ public class DataParser implements Serializable {
         float confidenceScoreRangePerGrouping = thresholdRange / groupingNumber;
 
         // Set up structure to hold all data
-        parsedData = new ArrayList();
+        parsedData = new ArrayList<ArrayList<String[]>[]>();
 
         // Loop through each file
         for (Object fileName : fileNames) {
 
             // For each file, create new array of ArrayLists and enter it into sketchData
-            ArrayList[] data = new ArrayList[groupingNumber];
+            @SuppressWarnings("unchecked")
+            ArrayList<String[]>[] data = new ArrayList[groupingNumber];
             parsedData.add(data);
 
             // Initialise ArrayLists
-            for (int i=0; i<groupingNumber; i++) { data[i] = new ArrayList(); }
+            for (int i=0; i<groupingNumber; i++) { data[i] = new ArrayList<String[]>(); }
 
             // Get the file matchings
-            AlignmentFile file = (AlignmentFile) uploadedFiles.get(fileName);
-            Iterator iter = file.getMatchings().iterator();
+            AlignmentFile file = uploadedFiles.get(fileName);
+            Iterator<String> iter = file.getMatchings().iterator();
 
             // Loop through each match, get entity and confidence score values
             float currentMax;
             while (iter.hasNext()) {
 
-                String matching = (String) iter.next();
+                String matching = iter.next();
                 String[] tokens = matching.split(",");
                 String entity1 = tokens[0];
                 String entity2 = tokens[1];

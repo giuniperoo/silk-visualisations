@@ -12,17 +12,16 @@ import org.apache.commons.io.LineIterator;
  */
 public class AlignmentParser implements Serializable {
 
+    private static final long serialVersionUID = 333334566269199033L;
+
     public static AlignmentFile parse(InputStream stream) {
 
         // file object to contain data
         AlignmentFile alignmentFile = new AlignmentFile();
 
-        List entity1Array = alignmentFile.getEntity1Array();
-        List entity2Array = alignmentFile.getEntity2Array();
-
         // references to class-wide containers for entity URIs of all loaded files
-        List entity1Pool = AlignmentFile.getEntity1Pool();
-        List entity2Pool = AlignmentFile.getEntity2Pool();
+        List<String> entity1Pool = AlignmentFile.getEntity1Pool();
+        List<String> entity2Pool = AlignmentFile.getEntity2Pool();
 
         try {
             LineIterator li = IOUtils.lineIterator(stream, "UTF-8");

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.data.DataParser;
-
+import org.alignment.AlignmentFile;
 
 /**
  *
@@ -19,7 +19,9 @@ import org.data.DataParser;
  */
 public class DataServlet extends HttpServlet {
 
-    @Override
+    private static final long serialVersionUID = 7932267110856262674L;
+
+    @Override @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -27,7 +29,8 @@ public class DataServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         HttpSession session = request.getSession();
-        HashMap uploadedFiles = (HashMap) session.getAttribute("uploadedFiles");
+        HashMap<String, AlignmentFile> uploadedFiles =
+                (HashMap<String, AlignmentFile>) session.getAttribute("uploadedFiles");
 
         // Handle Ajax call for individual matches with a given confidence score.
         // (This request is made by mouseover functionality in prototype 3.)
@@ -76,7 +79,7 @@ public class DataServlet extends HttpServlet {
                 session.setAttribute("dataParser", dataParser);
             }
 
-            ArrayList fileNames = new ArrayList();
+            ArrayList<String> fileNames = new ArrayList<String>();
 
             // get request query string
             String queryString = request.getQueryString();
@@ -138,7 +141,7 @@ public class DataServlet extends HttpServlet {
             out.close();
 
             // display error with a sensible message
-            response.sendError(response.SC_NOT_FOUND,
+            response.sendError(HttpServletResponse.SC_NOT_FOUND,
                     "Not sure how you got here, but in any event there's no going" +
                     " forward with what you've given me :-(");
         }

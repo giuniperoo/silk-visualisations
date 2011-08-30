@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,14 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.alignment.AlignmentFile;
 import org.alignment.AlignmentParser;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.FileCleanerCleanup;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileCleaningTracker;
-
 
 /**
  *
@@ -37,6 +34,7 @@ public class UploadServlet extends HttpServlet {
     private File destinationDir;
     private File tmpDir;
 
+    private static final long serialVersionUID = -461410675468154565L;
     private static final int SIZE_THRESHOLD = (5 * 1024 * 1024);        //   5 MB
     private static final long MAX_FILE_SIZE = (1000 * 1024 * 1024);     // 100 MB
     private static final long MAX_REQUEST_SIZE = (2000 * 1024 * 1024);  // 200 MB
@@ -86,23 +84,21 @@ public class UploadServlet extends HttpServlet {
 //        }
     }
 
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException { }
 
-    /*
-     * This method returns an HTTP status 200 message to the client
-     * regardless of whether the file is successfully deleted on the
-     * server-side. This enables the client UI to function as anticipated.
-     */
-    @Override
+
+    @Override @SuppressWarnings("unchecked")
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         response.setContentType("application/json");
 
         HttpSession session = request.getSession();
-        HashMap uploadedFiles = (HashMap) session.getAttribute("uploadedFiles");
+        HashMap<String, AlignmentFile> uploadedFiles =
+                (HashMap<String, AlignmentFile>) session.getAttribute("uploadedFiles");
 
         String fileName = request.getParameter("file");
 
@@ -112,19 +108,23 @@ public class UploadServlet extends HttpServlet {
             uploadedFiles.remove(fileName);
 
         } else {
-            log("Strangely, " + fileName + " was not found in the uploadedFiles HashMap");
+            log(fileName + " cannot be deleted - was not found in the uploadedFiles HashMap");
+
+            // display error with a sensible message
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            		"The file, " + fileName + ", could not be identified");
         }
 
-        // Delete file if it has been saved to disk
-        if (fileName != null) {
-
-            File goner = new File(DESTINATION_DIR_PATH + FILE_SEPARATOR + fileName);
-
-            boolean success = goner.delete();
-            if (!success) {
-                log("Unable to delete file from disk: " + fileName);
-            }
-        }
+//        // Delete file if it has been saved to disk  (DISABLED)
+//        if (fileName != null) {
+//
+//            File goner = new File(DESTINATION_DIR_PATH + FILE_SEPARATOR + fileName);
+//
+//            boolean success = goner.delete();
+//            if (!success) {
+//                log("Unable to delete file from disk: " + fileName);
+//            }
+//        }
     }
 
 //    EXPERIMENTAL - Use of the PUT method is currently not used
@@ -174,8 +174,7 @@ public class UploadServlet extends HttpServlet {
 //        }
 //    }
 
-
-    @Override
+    @Override @SuppressWarnings("unchecked")
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -186,7 +185,8 @@ public class UploadServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         HttpSession session = request.getSession();
-        HashMap uploadedFiles = (HashMap) session.getAttribute("uploadedFiles");
+        HashMap<String, AlignmentFile> uploadedFiles =
+                (HashMap<String, AlignmentFile>) session.getAttribute("uploadedFiles");
 
         // check to ensure that this is a file upload request
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -230,7 +230,7 @@ public class UploadServlet extends HttpServlet {
                     if (uploadedFiles == null) {
 
                         // initialise the HashMap so that it is ready to receive new files
-                        uploadedFiles = new HashMap();
+                        uploadedFiles = new HashMap<String, AlignmentFile>();
                         session.setAttribute("uploadedFiles", uploadedFiles);
                     }
 
@@ -252,7 +252,7 @@ boolean success = true;
 
                     } else {
                         // display error with a sensible message
-                        response.sendError(response.SC_INTERNAL_SERVER_ERROR,
+                        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                                            "Unable to parse file");
                     }
                 }
@@ -275,7 +275,7 @@ boolean success = true;
      * If a file with the same name already exists, append '_1'
      * to the name (or if '_1' already exists, increment the number).
      */
-    private String getUniqueFileName(String name, HashMap uploadedFiles) {
+    private String getUniqueFileName(String name, HashMap<String, AlignmentFile> uploadedFiles) {
 
         String fileName = name;
         int i, xmlIdx, underScoreIdx;
