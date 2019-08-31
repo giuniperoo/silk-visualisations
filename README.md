@@ -10,7 +10,7 @@ In the spirit of the Semantic Web, this project is implemented as a web applicat
 
 A working example of the project can be found at: [http://silk-visualisations.appspot.com/](http://silk-visualisations.appspot.com/)
 
-A WAR file of the project can be downloaded here: [Silk Visualisations 1.2](/downloads/tgiunipero/silk-visualisations/silk-visualisations-1.2.war)
+A WAR file of the project can be downloaded here: [Silk Visualisations 1.2](https://github.com/downloads/giuniperoo/silk-visualisations/silk-visualisations-1.2.war)
 
 * [Overview](#overview)
 * [Visual Models](#visual-models)
