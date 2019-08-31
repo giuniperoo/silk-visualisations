@@ -12,7 +12,7 @@ A WAR file of the project can be downloaded here: [Silk Visualisations 1.2](/dow
 
 * [Overview](#overview)
 * [Visual Models](#visual-models)
-* [System Architecture](/tgiunipero/silk-visualisations/wiki/System-Architecture)
+* [System Architecture](#system-architecture)
 * [Evaluation](/tgiunipero/silk-visualisations/wiki/Evaluation)
 * [Scalability](/tgiunipero/silk-visualisations/wiki/Scalability)
 * [About](/tgiunipero/silk-visualisations/wiki/About/)
@@ -301,4 +301,91 @@ On-hover functionality is implemented in the scatterplot as an AJAX call to the 
 1. The server’s `DataServlet` parses the query string, and uses the DataParser’s `getURIs` method to identify each source and target URI within the AlignmentFile’s `Entity1Pool` and `Entity2Pool`, respectively.
 1. The `DataServlet` sends the URIs to the client; the `getMatches` function receives them and calls the Processing file’s `displayMatches` function.
 1. The `displayMatches` function renders the URIs in the upper left corner of the canvas.
+
+
+## System Architecture
+
+The application is based on a client-server model. The architecture looks as follows:
+
+![diagram of application architecture](https://github.s3.amazonaws.com/downloads/giuniperoo/silk-visualisations/application-component-diagram.png)
+
+### Client-Side
+
+The client-side is responsible for the user interface, including the Processing scripts for each visualisation, jQuery interface widgets such as the upload widget, tabbed panel, slider, dialogs and buttons, and general HTML, JavaScript and CSS.
+
+#### Visualisations
+
+The implementation of the 3 visual models is discussed in [Visual Models](/tgiunipero/silk-visualisations/wiki/Visual-Models).
+
+#### User Interface
+
+Much of the interface functionality is available in the region to the left of the canvas, and was implemented with an aim to avoid unnecessary confusion involved in the activity of visualising one’s files. There is a 3-step process which provides visual cues to help a user interact with the system. In the image below, the three panels show the interface’s left region in various states of interaction.
+
+![image showing 3 interface steps](https://github.s3.amazonaws.com/downloads/giuniperoo/silk-visualisations/interface-steps.png)
+
+These steps are described as follows.
+
+**Step 1:** The opening state of the interface displays an “Import files” button. The button affords clicking, and so the user clicks the button, uploads relevant files into the displayed dialog, and confirms his or her selection to close the dialog. (A progress bar displays while files are being uploaded.)
+
+**Step 2:** Successfully uploaded files are displayed beneath the “Import files” button, and new content appears in the lower region of the interface. Instructions read, _“First select one or two files (click on the file names above), then click ‘Render chart’ to view their data in the canvas.”_ The “Render chart” button is in a deactivated state. The user selects files by clicking on the file names.
+
+**Step 3:** The interface is in a state where the background for file names is highlighted red or blue to indicate their selection. The “Render chart” button becomes active. The user clicks the “Render chart” button to initiate the visualisations.
+
+When the visualisations are rendered, the colour of the data corresponds to the background colours of the file names (red and blue). The user is able to click other tabs and immediately view the visualisation pertaining to that tab.
+
+### Server-Side
+
+The server-side is primarily responsible for handling data: parsing, storing, packaging and sending. The following provides a summary of the classes included in the server-side. As indicated in the image above showing the system architecture, classes are grouped into three packages: (1) Servlet, (2) Alignment, and (3) Data.
+
+#### Servlet package
+
+* **UploadServlet:** This servlet handles file uploads and deletion. It iterates through uploaded files and uses the `AlignmentParser` to convert them into `AlignmentFile` objects. `AlignmentFile` objects are then stored in a session-scoped HashMap. This servlet also contains a private method, `getUniqueFileName`, which determines a file name that can be used as a unique identifier. When a request to delete a file is received, this servlet locates the file in the session-scoped HashMap and removes it.
+
+* **DataServlet:** The `DataServlet` handles two requests, “`parseData`,” and “`getMatches`.” The “`parseData`” request occurs when a user clicks the “Render chart” button in the interface. The `DataServlet` retrieves the session-scoped HashMap containing `AlignmentFile` objects, as well as a session-scoped `DataParser` object. It then makes successive calls to the `DataParser` object’s methods using the HashMap and information from the query to (1) set the grouping number and confidence score thresholds, (2) parse data, and, if two files were selected by the user, (3) prepare file comparison data. It collects this data in JSON format and sends it to the client. The “`getMatches`” request responds to an AJAX call made from the on-hover functionality in the scatterplot. It uses the `DataParser` to look up URIs for the specified pairs of match keys, then returns them to the client.
+
+* **GeneratorServlet:** This servlet responds to form input from _WEBROOT_/file-generator/index.html, which enables generation of Alignment files used for testing purposes. It creates a folder named “alignmentOutput” in the user’s home directory, and outputs generated Alignment Files there. It calls `AlignmentFileGenerator` to create a pair of sample Alignment files.
+
+#### Alignment package
+
+* **AlignmentFile:** This class is used to represent an uploaded file. It stores four pieces of data: (1) the source URIs (content between `<entity1>` tags), (2) the target URIs (content between `<entity2>` tags), (3) the relation (content between the `<relation>` tags), and (4) matchings, which is a List of strings that contain the source and target URI keys, and the related confidence score. The `AlignmentFile` class also contains two class variables, `Entity1Pool` and `Entity2Pool`, which store source and target URIs across multiple files in a user session. (This ensures that URIs are not confused or overwritten between files.)
+
+* **AlignmentParser:** The `AlignmentParser` is responsible for parsing uploaded Alignment files into `AlignmentFile` objects.
+
+* **AlignmentFileWriter:** The `AlignmentFileWriter` contains two overloaded methods, called `writeToDisk`. The first method serialises an `AlignmentFile` object and stores it to disk. (This functionality is currently not used.) The second method is called by the `GeneratorServlet` to create two sample files in Alignment format and store them to disk.
+
+#### Data package
+
+* **DataParser:** This class is responsible for back-end data processing. Its tasks are to:
+
+   * parse `AlignmentFile` objects into a multidimensional array that is conducive to representation on the client-side
+   * set confidence score thresholds based on uploaded data
+   * set the grouping number (on the server-side) based on user choice
+   * generate file comparison data based on a 2-file selection
+   * fetch stored URIs based on key values
+   * prepare all data in JSON format
+
+* **RdfPrefixMap:** This class is an extended HashMap that stores RDF namespace prefixes as key-value pairs. It is used for the on-hover effect in the scatterplot to make a best-effort attempt to replace the full URI with an RDF namespace prefix. `RdfPrefixMap` stores 100 popular namespaces, according to: <http://richard.cyganiak.de/blog/2011/02/top-100-most-popular-rdf-namespace-prefixes/>.
+
+
+## Evaluation
+
+The implementation was tested using several Link Specifications from [LATC's 24/7 Interlinking Platform](https://github.com/LATC/24-7-platform). The goal was to ascertain whether the visualisations could uncover information that could be deemed helpful given a particular use case (such as those discussed in the [Overview](/tgiunipero/silk-visualisations/wiki/Overview)). While this evaluation is not exhaustive, it successfully demonstrates that the visualisations can provide insight into the data and applied similarity measures.
+
+The presented example involves querying [LinkedGeoData](http://linkedgeodata.org/) and the [Climb Dataincubator](http://ckan.net/package/data-incubator-climb) (a collection of data from [UKClimbing.com](http://www.ukclimbing.com/)) to obtain a listing of supermarkets within a given radius of climbing venues. Two Silk jobs were run; the first identified supermarkets within a 15 km radius of climbing venues, while the second extended the radius to 20 km. The visualisations provided useful insight into the WGS84 distance measure, and helped identify “curious” matches that would warrant inspection.
+
+Unsurprisingly, the histogram below shows that (1) there are approximately two thirds the number of supermarkets within a 15 km radius of climbing venues compared with that of a 20 km radius, and (2) as the distance from the venue increases, so does the number of supermarkets within that distance. This is indicated by the fact that the graphic tapers to the left - the WGS84 distance measure normalises the recorded distance so that a high confidence score signifies a short distance between two locations; distances beyond the specified threshold receive a zero value.
+
+![Sketch 1](https://github.s3.amazonaws.com/downloads/giuniperoo/silk-visualisations/sketch1-eval.png)
+
+The rotated histogram and scatterplot highlight a unique property of the WGS84 distance measure: as the distance threshold increases, so do the confidence scores assigned to a given distance. In the below image, the blue portion represents supermarket-climbing venue pairs that are between 15 and 20 km apart from each other. Since all of the matches occurring in the 15 km file also occur in the 20 km file, and since the confidence score distribution would remain the same between the two files, we can deduce that matches with confidence scores above 0.5 in the left file would have scores just above 0.62 in the right file.
+
+![Sketch 2](https://github.s3.amazonaws.com/downloads/giuniperoo/silk-visualisations/sketch2-eval.png)
+
+The rotated histogram also points out several instances of matches occurring in the right file which fall within the confidence range of matches that occur in the left file. (One such instance is denoted by the pop-up in the above image.) It could be worthwhile to investigate such matches as they are typically manifestations of a lack of understanding of either the similarity measures used in the Link Specification, and/or the data itself.
+
+Finally, the scatterplot provides a clear representation of the mentioned “unique” property of the WGS84 distance measure. In the image below, a linear trend indicates that matches in the 20 km file receive a higher confidence score, but that the difference between the two files decreases as scores increase. In other words, the closer two locations are to one another, the more similar the confidence scores will be, regardless of the distance threshold.
+
+![Sketch 3](https://github.s3.amazonaws.com/downloads/giuniperoo/silk-visualisations/sketch3-eval.png)
+
+The above images suggest that useful information can be gathered from the data as well. For example, if there were relatively few supermarkets within a 5 km radius of venues, but the number jumped significantly between 5 and 10 km, this would become clear through use of the visualisations, as the confidence score is directly proportional to distance.
 
