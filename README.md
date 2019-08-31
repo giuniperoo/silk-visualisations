@@ -1,6 +1,8 @@
 # Silk Visualisations
 Provides a set of statistical visualisations for Alignment files produced by the [Silk Link Discovery Framework](http://www.assembla.com/spaces/silk/wiki)
 
+This project was developed by Troy Giunipero `[giunipero at gmail]` as the basis for an MSc thesis at the [School of Informatics](http://www.ed.ac.uk/schools-departments/informatics) at the University of Edinburgh.
+
 
 The Silk Link Discovery Framework helps automate the process of finding relationships between items within the Semantic Web. It can produce large numbers of "candidate" matches based on user-specified criteria. The aim of this project is to provide an overview of match output and ability to compare results between entire files. This can help users better understand the data being queried, and lead to a more efficient work-effort.
 
@@ -13,9 +15,8 @@ A WAR file of the project can be downloaded here: [Silk Visualisations 1.2](/dow
 * [Overview](#overview)
 * [Visual Models](#visual-models)
 * [System Architecture](#system-architecture)
-* [Evaluation](/tgiunipero/silk-visualisations/wiki/Evaluation)
-* [Scalability](/tgiunipero/silk-visualisations/wiki/Scalability)
-* [About](/tgiunipero/silk-visualisations/wiki/About/)
+* [Evaluation](#evaluation)
+* [Scalability](#scalability)
 
 
 ## Overview
@@ -39,18 +40,22 @@ Silk output files can be produced in either [N-Triples](http://www.w3.org/2001/s
 
 ##### N-Triples
 
-    <http://dbpedia.org/resource/United_States_Agency_for_International_Development>
-    <http://www.w3.org/2002/07/owl#sameAs>
-    <http://logd.tw.rpi.edu/source/data-gov/dataset/92/value-of/agency/US_Agency_for_International_Development> .
+```
+<http://dbpedia.org/resource/United_States_Agency_for_International_Development>
+<http://www.w3.org/2002/07/owl#sameAs>
+<http://logd.tw.rpi.edu/source/data-gov/dataset/92/value-of/agency/US_Agency_for_International_Development> .
+```
 
 ##### Alignment
 
-    <Cell>
-      <entity1 rdf:resource="http://dbpedia.org/resource/United_States_Agency_for_International_Development"></entity1>
-      <entity2 rdf:resource="http://logd.tw.rpi.edu/source/data-gov/dataset/92/value-of/agency/US_Agency_for_International_Development"></entity2>
-      <relation><http://www.w3.org/2002/07/owl#sameAs></relation>
-      <measure rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.902</measure>
-    </Cell>
+```
+<Cell>
+  <entity1 rdf:resource="http://dbpedia.org/resource/United_States_Agency_for_International_Development"></entity1>
+  <entity2 rdf:resource="http://logd.tw.rpi.edu/source/data-gov/dataset/92/value-of/agency/US_Agency_for_International_Development"></entity2>
+  <relation><http://www.w3.org/2002/07/owl#sameAs></relation>
+  <measure rdf:datatype="http://www.w3.org/2001/XMLSchema#float">0.902</measure>
+</Cell>
+````
 
 Because the main purpose of the visualisations is to help understand how adjustments to Link Specification matching criteria can affect the output on given data, the focus in this project is on the Alignment format, which records a confidence score for each match.
 
@@ -389,3 +394,78 @@ Finally, the scatterplot provides a clear representation of the mentioned “uni
 
 The above images suggest that useful information can be gathered from the data as well. For example, if there were relatively few supermarkets within a 5 km radius of venues, but the number jumped significantly between 5 and 10 km, this would become clear through use of the visualisations, as the confidence score is directly proportional to distance.
 
+
+## Scalability
+
+A [performance test](#performance-testing) was conducted to determine the wait time for processing data of increasingly large files. The test used files created from the implementation’s file generator (accessible from Webroot/file-generator/index.html). As expected, with regular increase to the number of links, the wait time and size of the data passed from server to client increased quadratically. This is indicative of the fact that comparison data is formed by comparing each match from the first file with that of the second. The figure below shows a comparison of the number of links in each file to the time the implementation needed to process and return data to the browser.
+
+![table showing scalability results](https://github.s3.amazonaws.com/downloads/giuniperoo/silk-visualisations/scalability-table.png)
+
+Tests using two files of 25,000 links (~8 MB) were unsuccessful. Two attempts were made. The browser received an empty HTTP status 200 response after 15 minutes, with the server log reporting, “WARNING: Interrupting idle Thread: http-thread-pool-8080-(4).” The computer’s CPU was not thrashing however, and there was still available RAM. The suspected cause of the problem is that the browser places a limit on the time to respond to an AJAX query. (Tests were performed using the Firefox browser, version 5. In both attempts, the response time was recorded at exactly 15m01s.)
+
+Continued work would include an investigation into the bottlenecks that arise when processing larger files, i.e., browser memory, Java heap space, time constraints. This could begin with efforts to determine the cause of the above-mentioned problem. Additional testing should include profiling tests of Java heap space consumed by the server, and accumulated memory placed on the browser when multiple visualisations are produced in succession.
+
+Steps can be taken to improve efficiency. Confidence scores can be abridged upon initial parsing, rather than storing the full-length float values and abridging as needed in later stages. The `DataParser`’s `generateFileComparisonData` method should be reviewed to determine if there are ways to improve its time complexity. It currently contains five nested for loops (!), which lead to long processing times for larger files.
+
+### Performance Testing
+
+The scenario for the performance test involved a selection of two files and clicking “Render chart.” Sample files were created using the implementation’s file generator (accessible from _Webroot_/file-generator/index.html). Specifications for the file generator and interface were:
+
+* the number of shared matches = 2/3 the number of total matches
+* the number of shared matches with equal confidence scores = 1/2 the number of shared matches
+* grouping number set to default value of 70
+
+This test was performed on a computer with a 2.4 GHz Intel Core 2 Duo processor, with 4 GB of memory. Times and data sizes were recorded using the Firebug add-on for Firefox.
+
+<table>
+  <tr>
+    <td><strong>Number of links</strong> (each file)</td>
+    <td>100</td>
+    <td>500</td>
+    <td>1000</td>
+    <td>2000</td>
+    <td>5000</td>
+    <td>10,000</td>
+    <td>15,000</td>
+    <td>20,000</td>
+    <td>25,000</td>
+  </tr>
+  <tr>
+    <td><strong>File size</strong> (each file)</td>
+    <td>32 KB</td>
+    <td>160 KB</td>
+    <td>320 KB</td>
+    <td>640 KB</td>
+    <td>1.61 MB</td>
+    <td>3.21 MB</td>
+    <td>4.83 MB</td>
+    <td>6.45 MB</td>
+    <td>8.07 MB</td>
+  </tr>
+  <tr>
+    <td><strong>Data size</strong> (sent to browser)</td>
+    <td>8.1 KB</td>
+    <td>38.5 KB</td>
+    <td>76.6 KB</td>
+    <td>154.9 KB</td>
+    <td>388.2 KB</td>
+    <td>775 KB</td>
+    <td>1.1 MB</td>
+    <td>1.5 MB</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>Time</strong></td>
+    <td>30ms</td>
+    <td>645ms</td>
+    <td>2.02s</td>
+    <td>5.49s</td>
+    <td>33.52s</td>
+    <td>2m22s</td>
+    <td>6m32s</td>
+    <td>11m56s</td>
+    <td>15m01s*</td>
+  </tr>
+</table>
+
+*The browser received an empty HTTP status 200 response.
